@@ -49,27 +49,27 @@ sub serialize_args {
     my @output;
 
     foreach my $arg (@$args) {
-	my $hash_key = $arg->{hash_key	};
-	my $key	     = $arg->{key	};
+        my $hash_key = $arg->{hash_key	};
+        my $key	     = $arg->{key	};
 
-	if ( not $hash_key ) {
-	    $hash_key = join '_', map { lc $_ } ($key =~ m/([A-Z]?[a-z0-9]+)/g);
-	}
+        if ( not $hash_key ) {
+            $hash_key = join '_', map { lc $_ } ($key =~ m/([A-Z]?[a-z0-9]+)/g);
+        }
 
-	if ( ! exists $data->{ $hash_key } && $arg->{required} ) {
-	    croak "Required field $key missed";
-	}
+        if ( ! exists $data->{ $hash_key } && $arg->{required} ) {
+            croak "Required field $key missed";
+        }
 
-	#warn $hash_key;
+        #warn $hash_key;
 
-	my $d = $data->{ $hash_key  };
-	# NOTE FUCKING RECURSION!
-	if ( ! $d && (my $s = $self->can('_default_value_'.$hash_key)) ) {
-	    $d = $s->( $self, $arg, $data );
-	}
-	#my $t = $arg ->{ type	    };
+        my $d = $data->{ $hash_key  };
+        # NOTE FUCKING RECURSION!
+        if ( ! $d && (my $s = $self->can('_default_value_'.$hash_key)) ) {
+            $d = $s->( $self, $arg, $data );
+        }
+        #my $t = $arg ->{ type	    };
 
-	push @output, $self->serialize( $arg, $d );
+        push @output, $self->serialize( $arg, $d );
     }
 
     return @output;
@@ -85,7 +85,7 @@ sub request_prefix {
 <?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:si="http://soapinterop.org/xsd" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="$signature->{namespace}">
    <SOAP-ENV:Body>
-	 <impl:$signature->{name}>
+         <impl:$signature->{name}>
 EOF
 }
 
@@ -93,7 +93,7 @@ sub request_suffix {
     my ($self, $signature) = @_;
     return <<EOF;
 \n
-	</impl:$signature->{name}>
+        </impl:$signature->{name}>
     </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
 EOF
@@ -103,7 +103,7 @@ sub serialize {
     my ($self, $arg, $d) = @_;
 
     if ( my $serializer = $self->can('serialize_'.$arg->{type}) ) {
-	return $serializer->( $self, $arg, $d );
+        return $serializer->( $self, $arg, $d );
     }
 
     return _serialize_simple( $arg, $d );
@@ -123,51 +123,51 @@ sub serialize_map {
     my ($self, $arg, $hash) = @_;
 
     if ( ref $hash ne 'HASH' ) {
-	croak "$arg->{key} is not HASH ref";
+        croak "$arg->{key} is not HASH ref";
     }
 
     #warn Dumper $hash;
 
     if ( ! exists $arg->{key_sig} && exists $arg->{key_type} ) {
 
-	$arg->{key_sig} = {
-	    type => $arg->{key_type},
-	    key  => 'key',
-	};
+        $arg->{key_sig} = {
+            type => $arg->{key_type},
+            key  => 'key',
+        };
     }
 
     if ( ! exists $arg->{value_sig} && exists $arg->{value_type} ) {
 
-	$arg->{value_sig} = {
-	    type => $arg->{value_type},
-	    key  => 'value',
-	};
+        $arg->{value_sig} = {
+            type => $arg->{value_type},
+            key  => 'value',
+        };
     }
 
     my $key_sig    = $arg->{key_sig}
-	or croak "Unspecified key type for $arg->{key} map";
+        or croak "Unspecified key type for $arg->{key} map";
     my $value_sig  = $arg->{value_sig}
-	or croak "Unspecified key type for $arg->{key} map";
+        or croak "Unspecified key type for $arg->{key} map";
 
     my @output;
 
     push @output, _tag_start( $arg->{key}, q{xsi:type="apachesoap:Map"});
 
     while ( my ( $k, $v ) = each %$hash ) {
-	my @pair;
+        my @pair;
 
-	push @pair, q{<item>};
-	push @pair, $self->serialize(
-	    $key_sig,
-	    $k
-	);
-	push @pair, $self->serialize(
-	    $value_sig,
-	    $v
-	);
-	push @pair, q{</item>};
+        push @pair, q{<item>};
+        push @pair, $self->serialize(
+            $key_sig,
+            $k
+        );
+        push @pair, $self->serialize(
+            $value_sig,
+            $v
+        );
+        push @pair, q{</item>};
 
-	push @output, @pair;
+        push @output, @pair;
     }
 
     push @output, _tag_stop( $arg->{key} );
@@ -179,31 +179,31 @@ sub _serialize_array_or_vector {
     my ($self, $arg, $array) = @_;
 
     if ( ref $array ne 'ARRAY' ) {
-	croak "$arg->{key} is not ARRAY ref";
+        croak "$arg->{key} is not ARRAY ref";
     }
 
     if ( ! exists $arg->{elem_sig} && exists $arg->{elem_type} ) {
 
-	$arg->{elem_sig} = {
-	    type => $arg->{elem_type},
-	    key  => 'item',
-	};
+        $arg->{elem_sig} = {
+            type => $arg->{elem_type},
+            key  => 'item',
+        };
     }
 
     my $elem_sig = $arg->{elem_sig}
-	or croak "Unspecified element type for $arg->{key} array";
+        or croak "Unspecified element type for $arg->{key} array";
 
     my @output;
 
     my $attr = q{xsi:type="apachesoap:Vector"};
 
     if ( $arg->{type} eq 'array' ) {
-	my $elem_type_xml = get_xml_type( $elem_sig->{type} );
-	my $length	      = scalar @$array;
+        my $elem_type_xml = get_xml_type( $elem_sig->{type} );
+        my $length	      = scalar @$array;
 
-	$attr =
-	 q{xsi:type="SOAP-ENC:Array" }.
-	qq{SOAP-ENC:arrayType="$elem_type_xml\[$length]"};
+        $attr =
+         q{xsi:type="SOAP-ENC:Array" }.
+        qq{SOAP-ENC:arrayType="$elem_type_xml\[$length]"};
     }
 
     push @output, _tag_start( $arg->{key}, $attr );
@@ -214,7 +214,7 @@ sub _serialize_array_or_vector {
 #    };
 
     foreach my $elem (@$array) {
-	push @output, $self->serialize( $elem_sig, $elem );
+        push @output, $self->serialize( $elem_sig, $elem );
     }
 
     push @output, _tag_stop( $arg->{key} );
@@ -254,10 +254,10 @@ sub serialize_boolean {
     my ($self, $arg, $d) = @_;
 
     if ( ! $d || $d =~ m/^false$/i ) {
-	$d = 'false';
+        $d = 'false';
     }
     elsif ( $d =~ m/^true$/i || $d ) {
-	$d = 'true';
+        $d = 'true';
     }
 
     return _serialize_simple( $arg, $d );
@@ -267,7 +267,7 @@ sub serialize_int {
     my ($self, $arg, $d) = @_;
 
     unless ( defined $d && $d =~ m/^[0-9]+$/ ) {
-	croak "$arg->{key} is not integer";
+        croak "$arg->{key} is not integer";
     }
 
     return _serialize_simple( $arg, $d );

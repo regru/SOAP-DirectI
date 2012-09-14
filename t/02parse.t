@@ -42,24 +42,24 @@ for my $f ( glob('t/data/*.xml'), glob('data/*.xml') ) {
     my $o = SOAP::DirectI::Parse->new();
 
     eval {
-	$o->parse_xml_string( $xml );
+        $o->parse_xml_string( $xml );
     };
 
     my ($d, $s) = $o->fetch_data_and_signature();
 
     if ( not $data ) {
-	open my $fh, '>', "$fbase.dat";
-	$d = Dumper $d;
-	$d =~ s/\$VAR1 = //;
-	print $fh $d;
-	close $fh;
+        open my $fh, '>', "$fbase.dat";
+        $d = Dumper $d;
+        $d =~ s/\$VAR1 = //;
+        print $fh $d;
+        close $fh;
     }
     if ( not $sig ) {
-	open my $fh, '>', "$fbase.sig";
-	$s = Dumper $s;
-	$s =~ s/\$VAR1 = //;
-	print $fh $s;
-	close $fh;
+        open my $fh, '>', "$fbase.sig";
+        $s = Dumper $s;
+        $s =~ s/\$VAR1 = //;
+        print $fh $s;
+        close $fh;
     }
 
     is_deeply( $data, $d, "data for $s->{name}"		);
